@@ -12,7 +12,7 @@ var svg = d3.select("#line_chart")
     .attr("transform",
           "translate(" + margin.left + "," + margin.top + ")");
 
-d3.csv("https://raw.githubusercontent.com/jonathangiguere/Robinhood_Investment_Web_App/master/data/AAPL.csv?token=AM5LXBJUO7WS65OQGLECKBC66U6XC",
+d3.csv("https://raw.githubusercontent.com/jonathangiguere/Robinhood_Investment_Web_App/master/data/AAPL.csv",
 
     // When reading the csv, I must format variables:
     function(d){
