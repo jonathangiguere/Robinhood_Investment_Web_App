@@ -1,13 +1,63 @@
 <!DOCTYPE html>
 <html>
+<style>
+    body {
+        font: 10px "Helvetica Neue", Helvetica, Arial, sans-serif;
+    }
+
+    .axis path,
+    .axis line {
+        fill: none;
+        stroke: #000;
+        shape-rendering: crispEdges;
+    }
+
+    .x.axis path {
+        display: none;
+    }
+
+    .line {
+        fill: none;
+        stroke: steelblue;
+        stroke-width: 1.5px;
+    }
+
+    .overlay {
+        fill: none;
+        pointer-events: all;
+    }
+
+    .focus circle {
+        fill: steelblue;
+    }
+
+    .focus text {
+        font-size: 14px;
+    }
+
+    .tooltip {
+        fill: white;
+        stroke: #000;
+    }
+
+    .tooltip-date, .tooltip-likes {
+        font-weight: bold;
+    }
+
+    #x_bar_axis{
+        font-size: 0;
+    }
+
+</style>
 <head>
     <title>Line Chart</title>
 </head>
 <body>
 
     <!-- Create a div where the graph will take place -->
+    <!--
     <div id="line_chart"></div>
-
+    -->
 
     <!-- Initialize a select button -->
     <select id="selectButton"></select>
