@@ -86,7 +86,8 @@ d3.csv("https://raw.githubusercontent.com/jonathangiguere/Robinhood_Investment_W
         .domain([0, d3.max(data, function(d) { return d.volume }) ]);
     yAxis
         .attr("transform", "translate(" + width + ",0)")
-        .call(d3.axisRight(y_bar));
+        .call(d3.axisRight(y_bar)
+            .tickFormat(d3.format(".2s")));
 
     // text label for the y axis
       svg.append("text")
@@ -100,7 +101,7 @@ d3.csv("https://raw.githubusercontent.com/jonathangiguere/Robinhood_Investment_W
     // text label for the 2nd y axis
       svg.append("text")
           .attr("transform", "rotate(90)")
-          .attr("y", -800)
+          .attr("y", -850)
           .attr("x", (height / 2))
           .attr("dy", "1em")
           .style("text-anchor", "middle")
@@ -241,7 +242,8 @@ d3.csv("https://raw.githubusercontent.com/jonathangiguere/Robinhood_Investment_W
             .transition()
             .duration(1000)
             .attr("transform", "translate(" + width + ",0)")
-            .call(d3.axisRight(y_bar));
+            .call(d3.axisRight(y_bar)
+                .tickFormat(d3.format(".2s")));
 
         // add X axis for bar chart
         x_bar
