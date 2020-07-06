@@ -22,7 +22,7 @@ var svg = d3.select("#line_chart_dynamic")
           "translate(" + margin.left + "," + margin.top + ")");
 
 //Read the data
-d3.csv("https://raw.githubusercontent.com/jonathangiguere/Robinhood_Investment_Web_App/master/data/top_ten.csv", function(data) {
+d3.csv("https://raw.githubusercontent.com/jonathangiguere/Robinhood_Investment_Web_App/master/data/top_50.csv", function(data) {
 
     // format the data
     data.forEach(function(d) {
@@ -57,7 +57,7 @@ d3.csv("https://raw.githubusercontent.com/jonathangiguere/Robinhood_Investment_W
       .call(d3.axisBottom(x));
 
     // Filter for AAPL which is first up
-    var dataFilter = data.filter(function(d){return d.symbol=='AAPL'})
+    var dataFilter = data.filter(function(d){return d.symbol=='F'})
 
     // Add Y axis with selected group to get y axis right
     var y = d3.scaleLinear()
