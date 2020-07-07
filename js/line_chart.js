@@ -1,8 +1,8 @@
 //Dynamic line chart code
 
 // set the dimensions and margins of the graph
-var margin = {top: 50, right: 100, bottom: 50, left: 100},
-    width = 1000 - margin.left - margin.right,
+var margin = {top: 50, right: 200, bottom: 50, left: 100},
+    width = 900 - margin.left - 100,
     height = 400 - margin.top - margin.bottom;
 
 // Create bisector to be used for tool tip mouse over
@@ -46,7 +46,7 @@ d3.csv("https://raw.githubusercontent.com/jonathangiguere/Robinhood_Investment_W
     // A color scale: one color for each group
     var myColor = d3.scaleOrdinal()
       .domain(allGroup)
-      .range(d3.schemeSet2);
+      .range(d3.schemeCategory10);
 
       // Add X axis --> it is a date format
     var x = d3.scaleTime()
@@ -56,7 +56,7 @@ d3.csv("https://raw.githubusercontent.com/jonathangiguere/Robinhood_Investment_W
       .attr("transform", "translate(0," + height + ")")
       .call(d3.axisBottom(x));
 
-    // Filter for AAPL which is first up
+    // Filter for Ford Ticker which is first up
     var dataFilter = data.filter(function(d){return d.symbol=='F'})
 
     // Add Y axis with selected group to get y axis right
@@ -96,16 +96,22 @@ d3.csv("https://raw.githubusercontent.com/jonathangiguere/Robinhood_Investment_W
           .attr("x", 0 - (height / 2))
           .attr("dy", "1em")
           .style("text-anchor", "middle")
+          .style("fill", "white")
+          .style("font-weight", "500")
+          .style("font-size", "14px")
           .text("Market Close Price");
 
     // text label for the 2nd y axis
       svg.append("text")
           .attr("transform", "rotate(90)")
-          .attr("y", -850)
+          .attr("y", -775)
           .attr("x", (height / 2))
           .attr("dy", "1em")
           .style("text-anchor", "middle")
-          .text("Market Close Price");
+          .style("fill", "white")
+          .style("font-weight", "500")
+          .style("font-size", "14px")
+          .text("Trading Volume");
 
     // add X axis for bar chart
     x_bar
@@ -121,7 +127,16 @@ d3.csv("https://raw.githubusercontent.com/jonathangiguere/Robinhood_Investment_W
         .attr("y", height - (margin.top - 90))
         .attr("x", (width / 2))
         .style("text-anchor", "middle")
+        .style("fill", "white")
+        .style("font-weight", "500")
+        .style("font-size", "14px")
         .text("Day");
+
+    svg.append('text')
+     .attr('class', 'title')
+     .attr('y', -30)
+     .attr('x', -100)
+     .html('Close Price and Volume for Selected Ticker');
 
 
     // variable u: map data to existing bars
@@ -137,7 +152,7 @@ d3.csv("https://raw.githubusercontent.com/jonathangiguere/Robinhood_Investment_W
         .attr("y", function(d) { return y_bar(d.volume); })
         .attr("width", x_bar.bandwidth())
         .attr("height", function(d) { return height - y_bar(d.volume); })
-        .attr("fill", "rgb(102, 194, 165)")
+        .attr("fill", "#777777")
 
     // Initialize line with first group of the list
     var line = svg
@@ -148,7 +163,7 @@ d3.csv("https://raw.githubusercontent.com/jonathangiguere/Robinhood_Investment_W
           .x(function(d) { return x(d.begins_at) })
           .y(function(d) { return y(d.close_price) })
         )
-        .attr("stroke", 'rgb(102, 194, 165)')
+        .attr("stroke", '#74ec74')
         .style("stroke-width", 2)
         .style("fill", "none")
 
@@ -233,7 +248,9 @@ d3.csv("https://raw.githubusercontent.com/jonathangiguere/Robinhood_Investment_W
             .x(function(d) { return x(d.begins_at) })
             .y(function(d) { return y(d.close_price) })
           )
-          .attr("stroke", function(d){ return myColor(selectedGroup) })
+          .attr("stroke", '#74ec74')
+          //.attr("stroke", function(d){ return myColor(selectedGroup) })
+
 
         // Add Y axis for bar chart
         y_bar
@@ -268,7 +285,7 @@ d3.csv("https://raw.githubusercontent.com/jonathangiguere/Robinhood_Investment_W
             .attr("y", function(d) { return y_bar(d.volume); })
             .attr("width", x_bar.bandwidth())
             .attr("height", function(d) { return height - y_bar(d.volume); })
-            .attr("fill", function(d){ return myColor(selectedGroup) })
+            .attr("fill", "#777777")
 
 
         svg.append("rect")

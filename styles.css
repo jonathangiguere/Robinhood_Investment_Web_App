@@ -8,16 +8,16 @@
 }
 
 .focus circle {
-    fill: yellow;
+    fill: white;
 }
 
 .focus text {
     font-size: 14px;
+    fill: #74ec74;
 }
 
-.tooltip {
+rect.tooltip {
     fill: white;
-    stroke: #000;
 }
 
 .tooltip-date, .tooltip-likes {
@@ -28,3 +28,45 @@
     font-size: 0;
 }
 
+text.title{
+    font-size: 24px;
+    font-weight: 500;
+    fill: white;
+}
+
+text.subTitle{
+    font-weight: 500;
+    fill: white;
+}
+
+text.label{
+    font-weight: 600;
+}
+
+text.yearText{
+    font-size: 50px;
+    font-weight: 700;
+    fill: #777777;
+    opacity: 0.25;
+}
+
+.tick text {
+    fill: white;
+}
+
+.xAxis .tick:nth-child(2) text {
+    text-anchor: start;
+}
+
+.tick line {
+    shape-rendering: CrispEdges;
+    stroke: #777777;
+}
+
+.tick line.origin{
+    stroke: #777777;
+}
+
+path.domain{
+    stroke: #777777;
+}

@@ -1,7 +1,7 @@
 //Bar Chart Race code
 
 // set the dimensions and margins of the graph
-var margin2 = {top: 50, right: 100, bottom: 50, left: 100},
+var margin2 = {top: 50, right: 0, bottom: 50, left: 0},
     width2 = 1000 - margin2.left - margin2.right,
     height2 = 400 - margin2.top - margin2.bottom;
 
@@ -15,20 +15,25 @@ var svg2 = d3.select("#bar_chart_race")
           "translate(" + margin2.left + "," + margin2.top + ")");
 
 
-var dateFormatter2 = d3.timeFormat("%Y/%m/%d");
+var dateFormatter2 = d3.timeFormat("%Y-%m-%d");
 
-var tickDuration = 500;
+var tickDuration = 400;
 var top_n = 10;
 
 let barPadding = (height2-(margin2.bottom+margin2.top))/(top_n*5);
 
 let title = svg2.append('text')
      .attr('class', 'title')
-     .attr('y', 24)
-     .html('Most Popular Stocks 2018-Present');
+     .attr('y', 0)
+     .html('10 Most Popular Stocks on Robinhood');
 
-// Get first date in dataset
-let start_date = "2018-05-02";
+let subTitle = svg2.append("text")
+     .attr("class", "subTitle")
+     .attr("y", 27)
+     .html("Number of shares held 2020-01-16 to 2020-07-06");
+
+// Get first day of 2020
+let start_date = "2020-01-16";
 //console.log(start_date);
 
 d3.csv('https://raw.githubusercontent.com/jonathangiguere/Robinhood_Investment_Web_App/master/data/top_50_popularity.csv', function(data) {
@@ -39,10 +44,10 @@ d3.csv('https://raw.githubusercontent.com/jonathangiguere/Robinhood_Investment_W
     // Format data
     data.forEach(d => {
         d.users_holding = +d.users_holding,
-        //d.rank = 0,
         //d.lastValue = +d.lastValue,
         d.timestamp_date = d3.timeParse("%Y-%m-%d")(d.timestamp), //Get date as date object
-        d.colour = d3.hsl(Math.random()*360,0.75,0.75)
+        //d.colour = d3.hsl(Math.random()*360,0.75,0.75)
+        d.colour = '#74ec74'
     });
 
     //console.log(data);
@@ -57,7 +62,7 @@ d3.csv('https://raw.githubusercontent.com/jonathangiguere/Robinhood_Investment_W
 
     let x2 = d3.scaleLinear()
         .domain([0, d3.max(daySlice, d => d.users_holding)])
-        .range([margin.left, width-margin.right-65]);
+        .range([margin.left, width + 110]);
 
     let y2 = d3.scaleLinear()
         .domain([top_n, 0])
@@ -95,28 +100,17 @@ d3.csv('https://raw.githubusercontent.com/jonathangiguere/Robinhood_Investment_W
         .append('text')
         .attr('class', 'label')
         .attr('x', d => x2(d.users_holding)-8)
-        .attr('y', d => y2(d.rank)+5+((y2(1)-y2(0))/2)+5)
+        .attr('y', d => y2(d.rank)+5+((y2(1)-y2(0))/2)+3)
         .style('text-anchor', 'end')
         .html(d => d.Ticker);
-
-    // Value label for bars
-    svg2.selectAll('text.valueLabel')
-      .data(daySlice, d => d.Ticker)
-      .enter()
-      .append('text')
-      .attr('class', 'valueLabel')
-      .attr('x', d => x2(d.users_holding)+5)
-      .attr('y', d => y2(d.rank)+5+((y2(1)-y2(0))/2)+5)
-      .text(d => d3.format(',.0f')(d.users_holding));
 
     // Year label
     let dayText = svg2.append('text')
       .attr('class', 'yearText')
-      .attr('x', width2-margin2.right)
-      .attr('y', height2-25)
+      .attr('x', width2-190)
+      .attr('y', height2-50)
       .style('text-anchor', 'end')
-      .html(~~start_date)
-      .call(halo, 10);
+      .html(start_date);
 
     // ----------------------------------------------------------------------------------------
 
@@ -128,7 +122,7 @@ d3.csv('https://raw.githubusercontent.com/jonathangiguere/Robinhood_Investment_W
 
         daySlice.forEach((d,i) => d.rank = i);
 
-        console.log('IntervalYear: ', daySlice);
+        //console.log('IntervalYear: ', daySlice);
 
         x2.domain([0, d3.max(daySlice, d => d.users_holding)]);
 
@@ -138,7 +132,7 @@ d3.csv('https://raw.githubusercontent.com/jonathangiguere/Robinhood_Investment_W
         .ease(d3.easeLinear)
         .call(xAxis2);
 
-       let bars = svg.selectAll('.bar').data(daySlice, d => d.name);
+       let bars = svg2.selectAll('.bar').data(daySlice, d => d.Ticker);
 
        bars
         .enter()
@@ -167,11 +161,11 @@ d3.csv('https://raw.githubusercontent.com/jonathangiguere/Robinhood_Investment_W
           .duration(tickDuration)
           .ease(d3.easeLinear)
           .attr('width', d => x2(d.users_holding)-x2(0)-1)
-          .attr('y', d => y2(top_n+1)+5)
+          .attr('y', d => y2(top_n+1)+10000) //add 10,000 to get bar out of svg canvas
           .remove();
 
-       let labels = svg.selectAll('.label')
-          .data(daySlice, d => d.name);
+       let labels = svg2.selectAll('.label')
+          .data(daySlice, d => d.Ticker);
 
        labels
         .enter()
@@ -180,19 +174,18 @@ d3.csv('https://raw.githubusercontent.com/jonathangiguere/Robinhood_Investment_W
         .attr('x', d => x2(d.users_holding)-8)
         .attr('y', d => y2(top_n+1)+5+((y2(1)-y2(0))/2))
         .style('text-anchor', 'end')
-        .html(d => d.name)
+        .html(d => d.Ticker)
         .transition()
           .duration(tickDuration)
           .ease(d3.easeLinear)
-          .attr('y', d => y2(d.rank)+5+((y2(1)-y2(0))/2)+1);
-
+          .attr('y', d => y2(d.rank)+5+((y2(1)-y2(0))/2)+3);
 
        labels
           .transition()
           .duration(tickDuration)
             .ease(d3.easeLinear)
             .attr('x', d => x2(d.users_holding)-8)
-            .attr('y', d => y2(d.rank)+5+((y2(1)-y2(0))/2)+1);
+            .attr('y', d => y2(d.rank)+5+((y2(1)-y2(0))/2)+3);
 
        labels
           .exit()
@@ -200,68 +193,26 @@ d3.csv('https://raw.githubusercontent.com/jonathangiguere/Robinhood_Investment_W
             .duration(tickDuration)
             .ease(d3.easeLinear)
             .attr('x', d => x2(d.users_holding)-8)
-            .attr('y', d => y2(top_n+1)+5)
+            .attr('y', d => y2(top_n+1)+10000) // add 10,000 to get label out of svg canvas
             .remove();
 
+      //console.log(start_date)
+      dayText.html(start_date);
 
-
-       let valueLabels = svg.selectAll('.valueLabel').data(daySlice, d => d.name);
-
-       valueLabels
-          .enter()
-          .append('text')
-          .attr('class', 'valueLabel')
-          .attr('x', d => x2(d.users_holding)+5)
-          .attr('y', d => y2(top_n+1)+5)
-          .text(d => d3.format(',.0f')(d.lastValue))
-          .transition()
-            .duration(tickDuration)
-            .ease(d3.easeLinear)
-            .attr('y', d => y2(d.rank)+5+((y2(1)-y2(0))/2)+1);
-
-       valueLabels
-          .transition()
-            .duration(tickDuration)
-            .ease(d3.easeLinear)
-            .attr('x', d => x2(d.users_holding)+5)
-            .attr('y', d => y2(d.rank)+5+((y2(1)-y2(0))/2)+1)
-            .tween("text", function(d) {
-               let i = d3.interpolateRound(d.lastValue, d.users_holding);
-               return function(t) {
-                 this.textContent = d3.format(',')(i(t));
-              };
-            });
-
-    valueLabels
-        .exit()
-        .transition()
-          .duration(tickDuration)
-          .ease(d3.easeLinear)
-          .attr('x', d => x2(d.users_holding)+5)
-          .attr('y', d => y2(top_n+1)+5)
-          .remove();
-
-      dayText.html(~~start_date);
-
+      //End the ticker with specified date
      if(start_date == "2020-07-06") ticker.stop();
-     var next_day = new Date(start_date);
-     next_day.setDate(next_day.getDate() + 1);
-     console.log(next_day);
-     start_date = dateFormatter2(next_day);
-     console.log(start_day);
+     var start_date_date = d3.timeParse("%Y-%m-%d")(start_date); //get current val for start date as date
+     //console.log('start date date:', start_date_date);
+     var tomorrow = start_date_date;
+     tomorrow.setDate(start_date_date.getDate() + 1); // increment date obj by 1
+     //console.log('next day date', tomorrow);
+     start_date = dateFormatter2(tomorrow); // convert incremented day back to string
+     //console.log('next day string:', start_date);
    },tickDuration);
 
  });
 
- const halo = function(text, strokeWidth) {
-  text.select(function() { return this.parentNode.insertBefore(this.cloneNode(true), this); })
-    .style('fill', '#ffffff')
-     .style( 'stroke','#ffffff')
-     .style('stroke-width', strokeWidth)
-     .style('stroke-linejoin', 'round')
-     .style('opacity', 1);
 
-}
 
     // ----------------------------------------------------------------------------------------
 
