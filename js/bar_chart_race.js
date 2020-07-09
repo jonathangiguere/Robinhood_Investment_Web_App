@@ -36,9 +36,14 @@ let subTitle = svg2.append("text")
 let start_date = "2020-01-16";
 //console.log(start_date);
 
+//play button
+var moving = false;
+var playButton = d3.select("#play-button");
+var pauseButton = d3.select("#pause-button");
+var resetButton = d3.select("#reset-button");
+
 d3.csv('https://raw.githubusercontent.com/jonathangiguere/Robinhood_Investment_Web_App/master/data/top_50_popularity.csv', function(data) {
     //if (error) throw error;
-
     //console.log(data);
 
     // Format data
@@ -113,7 +118,6 @@ d3.csv('https://raw.githubusercontent.com/jonathangiguere/Robinhood_Investment_W
       .html(start_date);
 
     // ----------------------------------------------------------------------------------------
-
     let ticker = d3.interval(e => {
 
         daySlice = data.filter(d => d.timestamp == start_date)
@@ -132,7 +136,7 @@ d3.csv('https://raw.githubusercontent.com/jonathangiguere/Robinhood_Investment_W
         .ease(d3.easeLinear)
         .call(xAxis2);
 
-       let bars = svg2.selectAll('.bar').data(daySlice, d => d.Ticker);
+    let bars = svg2.selectAll('.bar').data(daySlice, d => d.Ticker);
 
        bars
         .enter()
@@ -164,7 +168,7 @@ d3.csv('https://raw.githubusercontent.com/jonathangiguere/Robinhood_Investment_W
           .attr('y', d => y2(top_n+1)+10000) //add 10,000 to get bar out of svg canvas
           .remove();
 
-       let labels = svg2.selectAll('.label')
+    let labels = svg2.selectAll('.label')
           .data(daySlice, d => d.Ticker);
 
        labels
@@ -199,21 +203,37 @@ d3.csv('https://raw.githubusercontent.com/jonathangiguere/Robinhood_Investment_W
       //console.log(start_date)
       dayText.html(start_date);
 
+      pauseButton
+        .on("click", function() {
+          ticker.stop();
+        });
+
+      resetButton
+        .on("click", function() {
+          start_date = "2020-01-16";
+        });
+
+      playButton
+        .on("click", function() {
+            //var start_date_date = d3.timeParse("%Y-%m-%d")(start_date);
+            //var tomorrow = start_date_date;
+            //tomorrow.setDate(start_date_date.getDate() + 1);
+            //start_date = dateFormatter2(tomorrow);
+            ticker
+        });
+
       //End the ticker with specified date
-     if(start_date == "2020-07-06") ticker.stop();
-     var start_date_date = d3.timeParse("%Y-%m-%d")(start_date); //get current val for start date as date
-     //console.log('start date date:', start_date_date);
-     var tomorrow = start_date_date;
-     tomorrow.setDate(start_date_date.getDate() + 1); // increment date obj by 1
-     //console.log('next day date', tomorrow);
-     start_date = dateFormatter2(tomorrow); // convert incremented day back to string
-     //console.log('next day string:', start_date);
-   },tickDuration);
+      if(start_date == "2020-07-06") ticker.stop();
+        var start_date_date = d3.timeParse("%Y-%m-%d")(start_date); //get current val for start date as date
+        //console.log('start date date:', start_date_date);
+        var tomorrow = start_date_date;
+        tomorrow.setDate(start_date_date.getDate() + 1); // increment date obj by 1
+        //console.log('next day date', tomorrow);
+        start_date = dateFormatter2(tomorrow); // convert incremented day back to string
+        //console.log('next day string:', start_date);
+      },tickDuration);
 
- });
-
-
-
+    });
     // ----------------------------------------------------------------------------------------
 
 

@@ -92,6 +92,10 @@ path.domain{
   width: 15rem;
 }
 
+#page-content-wrapper {
+  min-width: 100vw;
+}
+
 #wrapper.toggled #sidebar-wrapper {
   margin-left: 0;
 }
