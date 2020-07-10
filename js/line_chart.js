@@ -15,8 +15,8 @@ var dateFormatter = d3.timeFormat("%m/%d/%y");
 // append the svg object to the body of the page
 var svg = d3.select("#line_chart_dynamic")
   .append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
+    .attr("viewBox", '0 0 1000 400') // to make svg responsive
+    .style("padding-bottom", "40")
   .append("g")
     .attr("transform",
           "translate(" + margin.left + "," + margin.top + ")");
@@ -34,7 +34,7 @@ d3.csv("https://raw.githubusercontent.com/jonathangiguere/Robinhood_Investment_W
     // List of groups by stock symbol
     var allGroup = d3.map(data, function(d){return(d.symbol)}).keys()
 
-    // add the options to the button
+    // add the options to the ticker dropdown
     d3.select("#selectButton")
       .selectAll('myOptions')
         .data(allGroup)
@@ -43,12 +43,7 @@ d3.csv("https://raw.githubusercontent.com/jonathangiguere/Robinhood_Investment_W
       .text(function (d) { return d; }) // text showed in the menu
       .attr("value", function (d) { return d; }) // corresponding value returned by the button
 
-    // A color scale: one color for each group
-    var myColor = d3.scaleOrdinal()
-      .domain(allGroup)
-      .range(d3.schemeCategory10);
-
-      // Add X axis --> it is a date format
+    // Add X axis --> it is a date format
     var x = d3.scaleTime()
       .domain(d3.extent(data, function(d) { return d.begins_at; }))
       .range([ 0, width ]);
@@ -132,6 +127,7 @@ d3.csv("https://raw.githubusercontent.com/jonathangiguere/Robinhood_Investment_W
         .style("font-size", "14px")
         .text("Day");
 
+    // add title
     svg.append('text')
      .attr('class', 'title')
      .attr('y', -30)
@@ -186,23 +182,25 @@ d3.csv("https://raw.githubusercontent.com/jonathangiguere/Robinhood_Investment_W
         .attr("rx", 4)
         .attr("ry", 4);
 
-    // Text for dat
+    // Text for date
     focus.append("text")
         .attr("class", "tooltip-date")
         .attr("x", 18)
         .attr("y", -2);
 
-    // Text for volume
+    // Text for close price
     focus.append("text")
         .attr("x", 18)
         .attr("y", 18)
         .text("Close Price:");
 
+    // value for close price
     focus.append("text")
         .attr("class", "tooltip-likes")
         .attr("x", 100)
         .attr("y", 18);
 
+    // transparent rect for tool tip mouseover
     svg.append("rect")
         .attr("class", "overlay")
         .attr("width", width)
@@ -211,6 +209,7 @@ d3.csv("https://raw.githubusercontent.com/jonathangiguere/Robinhood_Investment_W
         .on("mouseout", function() { focus.style("display", "none"); })
         .on("mousemove", mousemove);
 
+    // Tooltip function
     function mousemove() {
         var x0 = x.invert(d3.mouse(this)[0]),
             i = bisectDate(dataFilter, x0, 1),
@@ -225,7 +224,7 @@ d3.csv("https://raw.githubusercontent.com/jonathangiguere/Robinhood_Investment_W
     // A function that update the chart
     function update(selectedGroup) {
 
-      // Create new data with the selection?
+      // Create new data with the selection
       var dataFilter = data.filter(function(d){return d.symbol==selectedGroup});
 
       // Add Y axis with selected group to get y axis right
@@ -249,8 +248,6 @@ d3.csv("https://raw.githubusercontent.com/jonathangiguere/Robinhood_Investment_W
             .y(function(d) { return y(d.close_price) })
           )
           .attr("stroke", '#74ec74')
-          //.attr("stroke", function(d){ return myColor(selectedGroup) })
-
 
         // Add Y axis for bar chart
         y_bar
@@ -287,7 +284,7 @@ d3.csv("https://raw.githubusercontent.com/jonathangiguere/Robinhood_Investment_W
             .attr("height", function(d) { return height - y_bar(d.volume); })
             .attr("fill", "#777777")
 
-
+        // transparent rect for tool tip mouseover
         svg.append("rect")
             .attr("class", "overlay")
             .attr("width", width)
@@ -296,6 +293,7 @@ d3.csv("https://raw.githubusercontent.com/jonathangiguere/Robinhood_Investment_W
             .on("mouseout", function() { focus.style("display", "none"); })
             .on("mousemove", mousemove);
 
+        // Tooltip function
         function mousemove() {
             var x0 = x.invert(d3.mouse(this)[0]),
             i = bisectDate(dataFilter, x0, 1),
@@ -305,23 +303,19 @@ d3.csv("https://raw.githubusercontent.com/jonathangiguere/Robinhood_Investment_W
             focus.attr("transform", "translate(" + x(d.begins_at) + "," + y(d.close_price) + ")");
             focus.select(".tooltip-date").text(dateFormatter(d.begins_at));
             focus.select(".tooltip-likes").text(formatValue(d.close_price));
-    }
-    }
+            }
+        } //end of updateChart function
 
     // When the button is changed, run the updateChart function
     d3.select("#selectButton").on("change", function(d) {
-
         // Select y axis by HTML class and remove when selection is changed
         var old_y_axis = d3.select('.y_axis');
             old_y_axis.remove();
-
         // Select overlay rect by HTML class and remove when selection is changed
         var old_rect = d3.select('.overlay');
             old_rect.remove();
-
         // recover the option that has been chosen
         var selectedOption = d3.select(this).property("value")
-
         // run the updateChart function with this selected option
         update(selectedOption)
     })

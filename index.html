@@ -23,20 +23,17 @@
 
     <!-- Sidebar -->
     <div class="bg-dark border-right border-secondary rounded-lg" id="sidebar-wrapper">
-      <div class="sidebar-heading">Animation Controls </div>
+      <div id="sidebar-heading" class="sidebar-heading">Animation Controls </div>
       <div class="list-group">
         <a id="play-button" href="#" class="list-group-item list-group-item-action bg-light">Play</a>
         <a id="pause-button" href="#" class="list-group-item list-group-item-action bg-light">Pause</a>
         <a id="reset-button" href="#" class="list-group-item list-group-item-action bg-light">Reset</a>
-        <a href="#" class="list-group-item list-group-item-action bg-light">Events</a>
-        <a href="#" class="list-group-item list-group-item-action bg-light">Profile</a>
-        <a href="#" class="list-group-item list-group-item-action bg-light">Status</a>
       </div>
     </div>
     <!-- /#sidebar-wrapper -->
 
-    <div class="flex-column">
-
+    <!-- flex column that holds navbar and vizzes -->
+    <div class="flex-column flex-grow-1">
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom border-secondary">
         <button class="btn bg-light" id="menu-toggle">Toggle Control Panel</button>
 
@@ -46,19 +43,22 @@
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
-            <li class="nav-item active">
-              <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">Link</a>
-            </li>
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <a class="nav-link dropdown-toggle nav-item active" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 Data Sources
               </a>
               <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
-                <a class="dropdown-item" href="#">Kaggle Data Source</a>
-                <a class="dropdown-item" href="#">Robinhood API Reference</a>
+                <a class="dropdown-item" target="_blank" href="https://www.kaggle.com/cprimozi/robinhood-stock-popularity-history">Popularity Data</a>
+                <a class="dropdown-item" target="_blank" href="https://robin-stocks.readthedocs.io/en/latest/">Robinhood API Reference</a>
+              </div>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                About Me
+              </a>
+              <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                <a class="dropdown-item" target="_blank" href="https://www.linkedin.com/in/jonathan-giguere-msba-78597aa9/">LinkedIn</a>
+                <a class="dropdown-item" target="_blank" href="https://github.com/jonathangiguere">GitHub</a>
               </div>
             </li>
           </ul>

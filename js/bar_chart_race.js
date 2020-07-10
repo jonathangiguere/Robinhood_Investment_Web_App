@@ -8,66 +8,62 @@ var margin2 = {top: 50, right: 0, bottom: 50, left: 0},
 // append the svg object to the body of the page
 var svg2 = d3.select("#bar_chart_race")
   .append("svg")
-    .attr("width", width2 + margin2.left + margin2.right)
-    .attr("height", height2 + margin2.top + margin2.bottom)
+    .attr("viewBox", '0 0 1050 400') // to make svg responsive
   .append("g")
     .attr("transform",
           "translate(" + margin2.left + "," + margin2.top + ")");
 
-
+// to convert dates
 var dateFormatter2 = d3.timeFormat("%Y-%m-%d");
 
+// length of animation
 var tickDuration = 400;
+
+//How many stocks to show
 var top_n = 10;
 
+//space between bars
 let barPadding = (height2-(margin2.bottom+margin2.top))/(top_n*5);
 
+// title and subtitle
 let title = svg2.append('text')
      .attr('class', 'title')
      .attr('y', 0)
      .html('10 Most Popular Stocks on Robinhood');
-
 let subTitle = svg2.append("text")
      .attr("class", "subTitle")
      .attr("y", 27)
      .html("Number of shares held 2020-01-16 to 2020-07-06");
 
-// Get first day of 2020
+// Get first day in data
 let start_date = "2020-01-16";
-//console.log(start_date);
 
-//play button
-var moving = false;
+// Get all buttons as variables
 var playButton = d3.select("#play-button");
 var pauseButton = d3.select("#pause-button");
 var resetButton = d3.select("#reset-button");
 
+// Read data and create plot
 d3.csv('https://raw.githubusercontent.com/jonathangiguere/Robinhood_Investment_Web_App/master/data/top_50_popularity.csv', function(data) {
-    //if (error) throw error;
-    //console.log(data);
 
     // Format data
     data.forEach(d => {
         d.users_holding = +d.users_holding,
-        //d.lastValue = +d.lastValue,
         d.timestamp_date = d3.timeParse("%Y-%m-%d")(d.timestamp), //Get date as date object
-        //d.colour = d3.hsl(Math.random()*360,0.75,0.75)
         d.colour = '#74ec74'
     });
 
-    //console.log(data);
-
+    // filter data for first day of data
     let daySlice = data.filter(d => d.timestamp == start_date)
         .sort((a,b) => b.users_holding - a.users_holding)
         .slice(0, top_n);
 
-        daySlice.forEach((d,i) => d.rank = i);
+        daySlice.forEach((d,i) => d.rank = i); // rank top 10 by popularity
 
-    //console.log('daySlice: ', daySlice)
-
+    // Scales and axes
     let x2 = d3.scaleLinear()
         .domain([0, d3.max(daySlice, d => d.users_holding)])
-        .range([margin.left, width + 110]);
+        .range([margin.left, width + 130]);
 
     let y2 = d3.scaleLinear()
         .domain([top_n, 0])
@@ -118,125 +114,127 @@ d3.csv('https://raw.githubusercontent.com/jonathangiguere/Robinhood_Investment_W
       .html(start_date);
 
     // ----------------------------------------------------------------------------------------
-    let ticker = d3.interval(e => {
 
-        daySlice = data.filter(d => d.timestamp == start_date)
-            .sort((a,b) => b.users_holding - a.users_holding)
-            .slice(0,top_n);
+    // call function when play button is clicked
+    playButton
+        .on("click", toggleAnimating);
 
-        daySlice.forEach((d,i) => d.rank = i);
+    var animateTimer;
 
-        //console.log('IntervalYear: ', daySlice);
+    // function that does animation
+    // Basically updates the start date each iteration to get that day's data
+    function toggleAnimating(){
 
-        x2.domain([0, d3.max(daySlice, d => d.users_holding)]);
+          animateTimer = setInterval(function(){
 
-        svg2.select('.xAxis')
-        .transition()
-        .duration(tickDuration)
-        .ease(d3.easeLinear)
-        .call(xAxis2);
+              // filter data for next day
+              daySlice = data.filter(d => d.timestamp == start_date)
+                .sort((a,b) => b.users_holding - a.users_holding)
+                .slice(0,top_n);
 
-    let bars = svg2.selectAll('.bar').data(daySlice, d => d.Ticker);
+              daySlice.forEach((d,i) => d.rank = i);
 
-       bars
-        .enter()
-        .append('rect')
-        .attr('class', d => `bar ${d.Ticker.replace(/\s/g,'_')}`)
-        .attr('x', x2(0)+1)
-        .attr( 'width', d => x2(d.users_holding)-x2(0)-1)
-        .attr('y', d => y2(top_n+1)+5)
-        .attr('height', y2(1)-y2(0)-barPadding)
-        .style('fill', d => d.colour)
-        .transition()
-          .duration(tickDuration)
-          .ease(d3.easeLinear)
-          .attr('y', d => y2(d.rank)+5);
+              // Update x axis
+              x2.domain([0, d3.max(daySlice, d => d.users_holding)]);
 
-       bars
-        .transition()
-          .duration(tickDuration)
-          .ease(d3.easeLinear)
-          .attr('width', d => x2(d.users_holding)-x2(0)-1)
-          .attr('y', d => y2(d.rank)+5);
+              svg2.select('.xAxis')
+                .transition()
+                .duration(tickDuration)
+                .ease(d3.easeLinear)
+                .call(xAxis2);
 
-       bars
-        .exit()
-        .transition()
-          .duration(tickDuration)
-          .ease(d3.easeLinear)
-          .attr('width', d => x2(d.users_holding)-x2(0)-1)
-          .attr('y', d => y2(top_n+1)+10000) //add 10,000 to get bar out of svg canvas
-          .remove();
+              // Update bars
+              let bars = svg2.selectAll('.bar').data(daySlice, d => d.Ticker);
 
-    let labels = svg2.selectAll('.label')
-          .data(daySlice, d => d.Ticker);
+               bars
+                .enter()
+                .append('rect')
+                .attr('class', d => `bar ${d.Ticker.replace(/\s/g,'_')}`)
+                .attr('x', x2(0)+1)
+                .attr( 'width', d => x2(d.users_holding)-x2(0)-1)
+                .attr('y', d => y2(top_n+1)+5)
+                .attr('height', y2(1)-y2(0)-barPadding)
+                .style('fill', d => d.colour)
+                .transition()
+                  .duration(tickDuration)
+                  .ease(d3.easeLinear)
+                  .attr('y', d => y2(d.rank)+5);
 
-       labels
-        .enter()
-        .append('text')
-        .attr('class', 'label')
-        .attr('x', d => x2(d.users_holding)-8)
-        .attr('y', d => y2(top_n+1)+5+((y2(1)-y2(0))/2))
-        .style('text-anchor', 'end')
-        .html(d => d.Ticker)
-        .transition()
-          .duration(tickDuration)
-          .ease(d3.easeLinear)
-          .attr('y', d => y2(d.rank)+5+((y2(1)-y2(0))/2)+3);
+               bars
+                .transition()
+                  .duration(tickDuration)
+                  .ease(d3.easeLinear)
+                  .attr('width', d => x2(d.users_holding)-x2(0)-1)
+                  .attr('y', d => y2(d.rank)+5);
 
-       labels
-          .transition()
-          .duration(tickDuration)
-            .ease(d3.easeLinear)
-            .attr('x', d => x2(d.users_holding)-8)
-            .attr('y', d => y2(d.rank)+5+((y2(1)-y2(0))/2)+3);
+               bars
+                .exit()
+                .transition()
+                  .duration(tickDuration)
+                  .ease(d3.easeLinear)
+                  .attr('width', d => x2(d.users_holding)-x2(0)-1)
+                  .attr('y', d => y2(top_n+1)+10000) //add 10,000 to get bar out of svg canvas
+                  .remove();
 
-       labels
-          .exit()
-          .transition()
-            .duration(tickDuration)
-            .ease(d3.easeLinear)
-            .attr('x', d => x2(d.users_holding)-8)
-            .attr('y', d => y2(top_n+1)+10000) // add 10,000 to get label out of svg canvas
-            .remove();
+              // Update labels on bars
+              let labels = svg2.selectAll('.label')
+                    .data(daySlice, d => d.Ticker);
 
-      //console.log(start_date)
-      dayText.html(start_date);
+               labels
+                .enter()
+                .append('text')
+                .attr('class', 'label')
+                .attr('x', d => x2(d.users_holding)-8)
+                .attr('y', d => y2(top_n+1)+5+((y2(1)-y2(0))/2))
+                .style('text-anchor', 'end')
+                .html(d => d.Ticker)
+                .transition()
+                  .duration(tickDuration)
+                  .ease(d3.easeLinear)
+                  .attr('y', d => y2(d.rank)+5+((y2(1)-y2(0))/2)+3);
 
-      pauseButton
-        .on("click", function() {
-          ticker.stop();
-        });
+               labels
+                  .transition()
+                  .duration(tickDuration)
+                    .ease(d3.easeLinear)
+                    .attr('x', d => x2(d.users_holding)-8)
+                    .attr('y', d => y2(d.rank)+5+((y2(1)-y2(0))/2)+3);
 
-      resetButton
-        .on("click", function() {
-          start_date = "2020-01-16";
-        });
+               labels
+                  .exit()
+                  .transition()
+                    .duration(tickDuration)
+                    .ease(d3.easeLinear)
+                    .attr('x', d => x2(d.users_holding)-8)
+                    .attr('y', d => y2(top_n+1)+10000) // add 10,000 to get label out of svg canvas
+                    .remove();
 
-      playButton
-        .on("click", function() {
-            //var start_date_date = d3.timeParse("%Y-%m-%d")(start_date);
-            //var tomorrow = start_date_date;
-            //tomorrow.setDate(start_date_date.getDate() + 1);
-            //start_date = dateFormatter2(tomorrow);
-            ticker
-        });
+              // Update date text in bottom right
+              dayText.html(start_date);
 
-      //End the ticker with specified date
-      if(start_date == "2020-07-06") ticker.stop();
-        var start_date_date = d3.timeParse("%Y-%m-%d")(start_date); //get current val for start date as date
-        //console.log('start date date:', start_date_date);
-        var tomorrow = start_date_date;
-        tomorrow.setDate(start_date_date.getDate() + 1); // increment date obj by 1
-        //console.log('next day date', tomorrow);
-        start_date = dateFormatter2(tomorrow); // convert incremented day back to string
-        //console.log('next day string:', start_date);
-      },tickDuration);
+              // clear interval on pause button click
+              // this pauses the animation
+              pauseButton
+                .on("click", function() {
+                  clearInterval(animateTimer);
+                });
 
-    });
-    // ----------------------------------------------------------------------------------------
+              // Reset date to first date when reset button is clicked
+              resetButton
+                .on("click", function() {
+                  start_date = "2020-01-16";
+                });
 
+            //End the ticker with specified date
+            if(start_date == "2020-07-06") clearInterval(animateTimer);
 
-
-
-
+              // This is where the date string gets converted to a date object
+              // Then it gets incremented and turned back into a string to filter
+              // data for the next day
+              var start_date_date = d3.timeParse("%Y-%m-%d")(start_date);
+              var tomorrow = start_date_date;
+              tomorrow.setDate(start_date_date.getDate() + 1);
+              start_date = dateFormatter2(tomorrow);
+              },tickDuration);
+            }
+          })
