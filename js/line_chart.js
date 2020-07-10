@@ -221,6 +221,8 @@ d3.csv("https://raw.githubusercontent.com/jonathangiguere/Robinhood_Investment_W
         focus.select(".tooltip-likes").text(formatValue(d.close_price));
     }
 
+//---------------------------------------------------------------------------------------------------------------------------------------
+
     // A function that update the chart
     function update(selectedGroup) {
 
